@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { urlFor } from "@/lib/sanity.image";
+import TourCard from "@/components/cards/TourCard";
 
 export default function PackagesClient({ data }: any) {
   if (!data) return null;
@@ -22,6 +20,7 @@ export default function PackagesClient({ data }: any) {
     setMaxPrice("");
   };
 
+  /* ================= FILTER STATES ================= */
   const filteredStates = useMemo(() => {
     if (selectedCountry === "All") return states;
     return states.filter(
@@ -29,6 +28,7 @@ export default function PackagesClient({ data }: any) {
     );
   }, [selectedCountry, states]);
 
+  /* ================= FILTER TOURS ================= */
   const filteredTours = useMemo(() => {
     return tours.filter((tour: any) => {
       return (
@@ -46,26 +46,28 @@ export default function PackagesClient({ data }: any) {
   return (
     <div>
 
-      {/* FILTER CARD */}
+      {/* ================= FILTER CARD ================= */}
       <div className="bg-white rounded-3xl shadow-xl p-8 mb-16 border border-gray-100">
 
         <div className="grid md:grid-cols-5 gap-5">
 
+          {/* Search */}
           <input
             type="text"
             placeholder="Search tours..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none transition"
+            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
           />
 
+          {/* Country */}
           <select
             value={selectedCountry}
             onChange={(e) => {
               setSelectedCountry(e.target.value);
               setSelectedState("All");
             }}
-            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none transition"
+            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
           >
             <option value="All">All Countries</option>
             {countries.map((c: any) => (
@@ -75,10 +77,11 @@ export default function PackagesClient({ data }: any) {
             ))}
           </select>
 
+          {/* State */}
           <select
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none transition"
+            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
           >
             <option value="All">All States</option>
             {filteredStates.map((s: any) => (
@@ -88,14 +91,16 @@ export default function PackagesClient({ data }: any) {
             ))}
           </select>
 
+          {/* Max Price */}
           <input
             type="number"
             placeholder="Max Price"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none transition"
+            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
           />
 
+          {/* Reset */}
           <button
             onClick={resetFilters}
             className="bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition"
@@ -106,12 +111,12 @@ export default function PackagesClient({ data }: any) {
         </div>
       </div>
 
-      {/* RESULT COUNT */}
+      {/* ================= RESULT COUNT ================= */}
       <p className="mb-8 text-gray-600 font-medium">
         Showing {filteredTours.length} tour(s)
       </p>
 
-      {/* EMPTY */}
+      {/* ================= EMPTY STATE ================= */}
       {filteredTours.length === 0 && (
         <div className="text-center py-20">
           <h3 className="text-xl font-semibold mb-4">
@@ -119,61 +124,29 @@ export default function PackagesClient({ data }: any) {
           </h3>
           <button
             onClick={resetFilters}
-            className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition"
+            className="bg-primary text-white px-6 py-3 rounded-xl hover:opacity-90 transition"
           >
             Reset Filters
           </button>
         </div>
       )}
 
-      {/* GRID */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+      {/* ================= TOURS GRID ================= */}
+      {filteredTours.length > 0 && (
+        <div className="grid 
+                        grid-cols-1 
+                        sm:grid-cols-2 
+                        lg:grid-cols-3 
+                        gap-10 
+                        max-w-6xl 
+                        mx-auto">
 
-        {filteredTours.map((tour: any) => (
-          <Link
-            key={tour._id}
-            href={`/packages/${tour.slug.current}`}
-            className="group bg-white rounded-3xl shadow-lg hover:shadow-2xl transition overflow-hidden"
-          >
-            <div className="relative h-60">
-              <Image
-                src={urlFor(tour.mainImage).url()}
-                alt={tour.title}
-                fill
-                className="object-cover group-hover:scale-110 transition duration-500"
-              />
+          {filteredTours.map((tour: any) => (
+            <TourCard key={tour._id} tour={tour} />
+          ))}
 
-              {tour.duration && (
-                <div className="absolute top-4 right-4 bg-white px-4 py-1 text-sm font-semibold rounded-full shadow">
-                  {tour.duration}
-                </div>
-              )}
-            </div>
-
-            <div className="p-6">
-              <h3 className="font-bold text-lg mb-2 group-hover:text-blue-600 transition">
-                {tour.title}
-              </h3>
-
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                {tour.shortDescription}
-              </p>
-
-              <div className="flex justify-between items-center">
-                <span className="text-yellow-600 font-bold text-lg">
-                  ₹{tour.price?.toLocaleString()}
-                </span>
-
-                <span className="text-blue-600 font-medium">
-                  View Details →
-                </span>
-              </div>
-            </div>
-
-          </Link>
-        ))}
-
-      </div>
+        </div>
+      )}
 
     </div>
   );

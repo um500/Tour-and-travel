@@ -3,6 +3,7 @@ import { urlFor } from "@/lib/sanity.image";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import TourCard from "@/components/cards/TourCard";
 
 /* ================= UNIVERSAL GROQ QUERY ================= */
 const query = `
@@ -55,12 +56,9 @@ export default async function DestinationPage({
   params: Promise<{ slug: string }>;
 }) {
 
-  // ✅ Next.js 16 FIX
   const { slug } = await params;
 
-  if (!slug) {
-    return notFound();
-  }
+  if (!slug) return notFound();
 
   let data;
 
@@ -71,15 +69,10 @@ export default async function DestinationPage({
     return notFound();
   }
 
-  if (!data) {
-    return notFound();
-  }
+  if (!data) return notFound();
 
   const pageData = data.state ?? data.country;
-
-  if (!pageData) {
-    return notFound();
-  }
+  if (!pageData) return notFound();
 
   const tours = data.tours ?? [];
 
@@ -152,8 +145,8 @@ export default async function DestinationPage({
       )}
 
       {/* ================= TOURS ================= */}
-      <section className="container mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold mb-12 text-center">
+      <section className="max-w-6xl mx-auto px-6 py-24">
+        <h2 className="text-3xl font-bold mb-16 text-center">
           Available Tours in {pageData.name}
         </h2>
 
@@ -162,51 +155,16 @@ export default async function DestinationPage({
             No tours available yet.
           </p>
         ) : (
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid 
+                          grid-cols-1 
+                          sm:grid-cols-2 
+                          lg:grid-cols-3 
+                          gap-10">
+
             {tours.map((tour: any) => (
-              <Link
-                key={tour._id}
-                href={`/packages/${tour.slug?.current}`}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300"
-              >
-                <div className="relative h-56">
-                  {tour.mainImage && (
-                    <Image
-                      src={urlFor(tour.mainImage).url()}
-                      alt={tour.title}
-                      fill
-                      className="object-cover"
-                    />
-                  )}
-
-                  {tour.duration && (
-                    <div className="absolute top-4 right-4 bg-white px-3 py-1 text-sm font-semibold rounded-full shadow">
-                      {tour.duration}
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-6">
-                  <h3 className="font-semibold text-lg mb-2">
-                    {tour.title}
-                  </h3>
-
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {tour.shortDescription}
-                  </p>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-yellow-600 font-bold text-lg">
-                      ₹{tour.price?.toLocaleString()}
-                    </span>
-
-                    <span className="text-blue-600 font-medium">
-                      View Details →
-                    </span>
-                  </div>
-                </div>
-              </Link>
+              <TourCard key={tour._id} tour={tour} />
             ))}
+
           </div>
         )}
       </section>

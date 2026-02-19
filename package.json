@@ -9,13 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
     "@sanity/image-url": "^2.0.3",
+    "axios": "^1.13.5",
     "clsx": "^2.1.1",
     "lucide-react": "^0.574.0",
     "next": "16.1.6",
     "next-sanity": "^12.1.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-select": "^5.10.2",
+    "react-sparklines": "^1.7.0",
     "swiper": "^12.1.1",
     "tailwind-merge": "^3.4.1"
   },
@@ -24,6 +28,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-sparklines": "^1.7.5",
     "autoprefixer": "^10.4.24",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",

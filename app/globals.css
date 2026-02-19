@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* ============================= */
+/* Root Theme */
+/* ============================= */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -23,13 +27,63 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden; /* IMPORTANT for sliders */
 }
 
+/* ============================= */
+/* Hero Zoom Animation */
+/* ============================= */
+
 @keyframes zoom {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.15); }
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.15);
+  }
 }
 
 .animate-zoom {
   animation: zoom 8s ease-in-out infinite alternate;
+}
+
+/* ============================= */
+/* Infinite Scroll Animations */
+/* ============================= */
+
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 45s linear infinite;
+  width: max-content;
+}
+
+.animate-scroll-right {
+  animation: scroll-right 45s linear infinite;
+  width: max-content;
+}
+
+/* ============================= */
+/* Optional: Pause on Hover */
+/* ============================= */
+
+.animate-scroll-left:hover,
+.animate-scroll-right:hover {
+  animation-play-state: paused;
 }
