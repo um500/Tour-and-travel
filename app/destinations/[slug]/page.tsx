@@ -4,21 +4,39 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-/* ================= GROQ QUERY ================= */
+/* ================= UNIVERSAL GROQ QUERY ================= */
 const query = `
 {
   "country": *[_type == "country" && slug.current == $slug][0]{
     _id,
     name,
+    slug,
     mainImage,
     shortDescription,
     description,
     gallery[]
   },
 
+  "state": *[_type == "state" && slug.current == $slug][0]{
+    _id,
+    name,
+    slug,
+    mainImage,
+    shortDescription,
+    description,
+    gallery[],
+    country->{
+      name,
+      slug
+    }
+  },
+
   "tours": *[
     _type == "tour" &&
-    state->country->slug.current == $slug
+    (
+      state->slug.current == $slug ||
+      state->country->slug.current == $slug
+    )
   ]{
     _id,
     title,
@@ -37,32 +55,43 @@ export default async function DestinationPage({
   params: Promise<{ slug: string }>;
 }) {
 
-  /* ✅ Next.js 16 requires await on params */
+  // ✅ Next.js 16 FIX
   const { slug } = await params;
 
   if (!slug) {
     return notFound();
   }
 
-  /* ✅ Pass slug correctly to Sanity */
-  const data = await sanityClient.fetch(query, { slug });
+  let data;
 
-  if (!data || !data.country) {
+  try {
+    data = await sanityClient.fetch(query, { slug });
+  } catch (error) {
+    console.error("Sanity fetch error:", error);
     return notFound();
   }
 
-  const country = data.country;
-  const tours = data.tours || [];
+  if (!data) {
+    return notFound();
+  }
+
+  const pageData = data.state ?? data.country;
+
+  if (!pageData) {
+    return notFound();
+  }
+
+  const tours = data.tours ?? [];
 
   return (
     <div className="bg-white pt-32">
 
-      {/* ================= HERO ================= */}
+      {/* ================= HERO SECTION ================= */}
       <section className="relative h-[75vh]">
-        {country.mainImage && (
+        {pageData.mainImage && (
           <Image
-            src={urlFor(country.mainImage).url()}
-            alt={country.name}
+            src={urlFor(pageData.mainImage).url()}
+            alt={pageData.name}
             fill
             priority
             className="object-cover"
@@ -71,32 +100,32 @@ export default async function DestinationPage({
 
         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center px-4">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            Explore {country.name}
+            Explore {pageData.name}
           </h1>
 
-          {country.shortDescription && (
+          {pageData.shortDescription && (
             <p className="text-white max-w-3xl text-lg opacity-90">
-              {country.shortDescription}
+              {pageData.shortDescription}
             </p>
           )}
         </div>
       </section>
 
       {/* ================= DESCRIPTION ================= */}
-      {country.description && (
+      {pageData.description && (
         <section className="container mx-auto px-6 py-20">
           <h2 className="text-3xl font-bold mb-8 text-center">
-            About {country.name}
+            About {pageData.name}
           </h2>
 
           <p className="text-gray-700 leading-relaxed max-w-4xl mx-auto text-center text-lg">
-            {country.description}
+            {pageData.description}
           </p>
         </section>
       )}
 
       {/* ================= GALLERY ================= */}
-      {country.gallery?.length > 0 && (
+      {pageData.gallery?.length > 0 && (
         <section className="bg-gray-50 py-20">
           <div className="container mx-auto px-6">
             <h2 className="text-3xl font-bold mb-12 text-center">
@@ -104,7 +133,7 @@ export default async function DestinationPage({
             </h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {country.gallery.map((img: any, index: number) => (
+              {pageData.gallery.map((img: any, index: number) => (
                 <div
                   key={index}
                   className="relative h-56 rounded-2xl overflow-hidden shadow-md"
@@ -125,7 +154,7 @@ export default async function DestinationPage({
       {/* ================= TOURS ================= */}
       <section className="container mx-auto px-6 py-20">
         <h2 className="text-3xl font-bold mb-12 text-center">
-          Available Tours in {country.name}
+          Available Tours in {pageData.name}
         </h2>
 
         {tours.length === 0 ? (
