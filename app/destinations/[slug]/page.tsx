@@ -50,7 +50,7 @@ const query = `
 export default async function DestinationPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
 
   // ✅ IMPORTANT FIX FOR NEXT 16
