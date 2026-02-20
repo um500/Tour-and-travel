@@ -18,25 +18,14 @@ export const internationalCountriesQuery = `
 `;
 
 export const homeToursQuery = `
-{
-  "trending": *[_type == "tour" && category == "trending"][0...3]{
-    _id,
-    title,
-    slug,
-    price,
-    duration,
-    shortDescription,
-    mainImage
-  },
-  "popular": *[_type == "tour" && category == "popular"][0...3]{
-    _id,
-    title,
-    slug,
-    price,
-    duration,
-    shortDescription,
-    mainImage
-  }
+*[_type == "tour"] | order(_createdAt desc){
+  _id,
+  title,
+  slug,
+  price,
+  duration,
+  shortDescription,
+  mainImage,
+  category
 }
 `;
-

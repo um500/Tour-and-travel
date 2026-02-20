@@ -8,6 +8,7 @@ import {
   Poppins,
   Great_Vibes,
 } from "next/font/google";
+import CTA from "@/components/sections/CTA";
 
 /* ================= FONTS ================= */
 
@@ -55,17 +56,17 @@ export default function RootLayout({
           flex
           flex-col
           min-h-screen
+          overflow-x-hidden   /* 🔥 IMPORTANT FIX */
         `}
       >
-        {/* Navbar Always On Top */}
         <Navbar />
 
-        {/* Page Content */}
-        <main className="flex-grow">
+        <main className="flex-grow w-full overflow-hidden pt-[112px]">
           {children}
         </main>
 
-        {/* Footer Always At Bottom */}
+        <CTA />
+
         <Footer />
       </body>
     </html>

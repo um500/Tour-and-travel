@@ -3,10 +3,10 @@ import { Facebook, Instagram, Twitter, Mail, Phone } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0e2240] text-white mt-20">
+    <footer className="bg-[#0e2240] text-white">
 
-      {/* ================= TOP SECTION ================= */}
-      <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10">
+      {/* TOP SECTION */}
+      <div className="max-w-7xl mx-auto px-6 py-16 grid sm:grid-cols-2 md:grid-cols-4 gap-10">
 
         {/* Logo + About */}
         <div>
@@ -26,10 +26,10 @@ export default function Footer() {
             Quick Links
           </h3>
           <ul className="space-y-2 text-sm text-gray-300">
-            <li><Link href="/" className="hover:text-yellow-400">Home</Link></li>
-            <li><Link href="/packages" className="hover:text-yellow-400">Tours</Link></li>
-            <li><Link href="/about" className="hover:text-yellow-400">About Us</Link></li>
-            <li><Link href="/contact" className="hover:text-yellow-400">Contact</Link></li>
+            <li><Link href="/" className="hover:text-yellow-400 transition">Home</Link></li>
+            <li><Link href="/packages" className="hover:text-yellow-400 transition">Tours</Link></li>
+            <li><Link href="/about" className="hover:text-yellow-400 transition">About Us</Link></li>
+            <li><Link href="/contact" className="hover:text-yellow-400 transition">Contact</Link></li>
           </ul>
         </div>
 
@@ -39,10 +39,10 @@ export default function Footer() {
             Popular Destinations
           </h3>
           <ul className="space-y-2 text-sm text-gray-300">
-            <li><Link href="/destinations/india" className="hover:text-yellow-400">India</Link></li>
-            <li><Link href="/destinations/uae" className="hover:text-yellow-400">UAE</Link></li>
-            <li><Link href="/destinations/japan" className="hover:text-yellow-400">Japan</Link></li>
-            <li><Link href="/destinations/france" className="hover:text-yellow-400">France</Link></li>
+            <li><Link href="/destinations/india" className="hover:text-yellow-400 transition">India</Link></li>
+            <li><Link href="/destinations/uae" className="hover:text-yellow-400 transition">UAE</Link></li>
+            <li><Link href="/destinations/japan" className="hover:text-yellow-400 transition">Japan</Link></li>
+            <li><Link href="/destinations/france" className="hover:text-yellow-400 transition">France</Link></li>
           </ul>
         </div>
 
@@ -64,15 +64,15 @@ export default function Footer() {
 
           {/* Social Icons */}
           <div className="flex gap-4 mt-6">
-            <Facebook className="hover:text-yellow-400 cursor-pointer" />
-            <Instagram className="hover:text-yellow-400 cursor-pointer" />
-            <Twitter className="hover:text-yellow-400 cursor-pointer" />
+            <Facebook className="hover:text-yellow-400 cursor-pointer transition" />
+            <Instagram className="hover:text-yellow-400 cursor-pointer transition" />
+            <Twitter className="hover:text-yellow-400 cursor-pointer transition" />
           </div>
         </div>
 
       </div>
 
-      {/* ================= BOTTOM BAR ================= */}
+      {/* BOTTOM BAR */}
       <div className="border-t border-gray-700 py-6 text-center text-sm text-gray-400">
         © {new Date().getFullYear()} Equatorial Tours. All rights reserved.
       </div>

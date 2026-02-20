@@ -16,153 +16,178 @@ export default function NavbarClient({
   const [openMobileMenu, setOpenMobileMenu] = useState<string | null>(null);
 
   return (
-    <header className="fixed w-full z-50">
+    <header className="fixed top-0 left-0 w-full z-50">
 
-      {/* TOP BAR */}
-      <div className="bg-yellow-500 text-black text-sm py-2 px-6 flex justify-between">
-        <span>📧 info@equatorialtours.com</span>
-        <span>📞 +91 98765 43210</span>
+      {/* ================= TOP BAR ================= */}
+      <div className="bg-yellow-500 text-black text-xs sm:text-sm py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between">
+          <span>📧 info@equatorialtours.com</span>
+          <span>📞 +91 98765 43210</span>
+        </div>
       </div>
 
-      {/* MAIN NAV */}
-      <nav className="bg-[#0e2240] text-white relative">
-        <div className="max-w-7xl mx-auto px-6 flex items-center h-20">
+      {/* ================= MAIN NAV ================= */}
+      <nav className="bg-[#0e2240] text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
-          {/* Logo */}
-          <Link href="/" className="text-3xl font-serif font-semibold">
+          {/* LEFT - LOGO */}
+          <Link
+            href="/"
+            className="text-2xl sm:text-3xl font-serif font-semibold whitespace-nowrap"
+          >
             <span>Equatorial </span>
             <span className="text-yellow-400">Tours</span>
           </Link>
 
-          {/* DESKTOP MENU */}
-          <div className="hidden lg:flex gap-8 items-center ml-auto mr-10">
+          {/* RIGHT - MENU + PHONE */}
+          <div className="hidden lg:flex items-center gap-12">
 
-            <Link href="/" className="hover:text-yellow-400">
-              HOME
-            </Link>
+            {/* MENU LINKS */}
+            <div className="flex items-center gap-8 text-sm">
 
-            {/* INTERNATIONAL */}
-            <div
-              className="relative"
-              onMouseEnter={() => setOpenDesktopMenu("international")}
-              onMouseLeave={() => setOpenDesktopMenu(null)}
-            >
-              <button className="flex items-center gap-1 hover:text-yellow-400">
-                INTERNATIONAL <ChevronDown size={16} />
-              </button>
+              <Link href="/" className="hover:text-yellow-400">
+                HOME
+              </Link>
 
-              {openDesktopMenu === "international" && (
-                <div className="absolute left-0 top-full bg-[#0e2240] p-6 w-72 shadow-xl rounded-lg">
+              <Link href="/about" className="hover:text-yellow-400">
+                ABOUT
+              </Link>
 
-                  {internationalCountries?.map((country) => (
-                    <div key={country.slug}>
+              <Link href="/currency" className="hover:text-yellow-400">
+                CURRENCY
+              </Link>
 
-                      {/* FIXED ROUTE */}
+              {/* INTERNATIONAL */}
+              <div
+                className="relative"
+                onMouseEnter={() => setOpenDesktopMenu("international")}
+                onMouseLeave={() => setOpenDesktopMenu(null)}
+              >
+                <button className="flex items-center gap-1 hover:text-yellow-400">
+                  INTERNATIONAL <ChevronDown size={16} />
+                </button>
+
+                {openDesktopMenu === "international" && (
+                  <div className="absolute left-0 top-full bg-[#0e2240] p-6 w-72 shadow-xl rounded-lg">
+                    {internationalCountries?.map((country) => (
                       <Link
+                        key={country.slug}
                         href={`/destinations/${country.slug}`}
                         className="block hover:text-yellow-400 py-1"
                       >
                         {country.name}
                       </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-                    </div>
-                  ))}
+              {/* INDIA */}
+              <div
+                className="relative"
+                onMouseEnter={() => setOpenDesktopMenu("india")}
+                onMouseLeave={() => setOpenDesktopMenu(null)}
+              >
+                <button className="flex items-center gap-1 hover:text-yellow-400">
+                  INDIA <ChevronDown size={16} />
+                </button>
 
-                </div>
-              )}
-            </div>
-
-            {/* INDIA */}
-            <div
-              className="relative"
-              onMouseEnter={() => setOpenDesktopMenu("india")}
-              onMouseLeave={() => setOpenDesktopMenu(null)}
-            >
-              <button className="flex items-center gap-1 hover:text-yellow-400">
-                INDIA <ChevronDown size={16} />
-              </button>
-
-              {openDesktopMenu === "india" && (
-                <>
-                  <div className="absolute top-full left-0 w-full h-4" />
-
-                  <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+4px)] bg-[#0e2240] p-8 w-[1000px] shadow-2xl rounded-lg">
-                    <div className="grid grid-cols-4 gap-4 text-sm">
-
+                {openDesktopMenu === "india" && (
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full bg-[#0e2240] p-8 max-w-6xl w-[95vw] lg:w-[900px] shadow-2xl rounded-lg">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                       {indiaStates?.map((state) => (
                         <Link
                           key={state.slug}
-                          href={`/destinations/${state.slug}`}   
+                          href={`/destinations/${state.slug}`}
                           className="hover:text-yellow-400"
                         >
                           {state.name}
                         </Link>
                       ))}
-
                     </div>
                   </div>
-                </>
-              )}
+                )}
+              </div>
+
+              <Link href="/packages" className="hover:text-yellow-400">
+                TOURS
+              </Link>
+
+              <Link href="/contact" className="hover:text-yellow-400">
+                CONTACT
+              </Link>
+
             </div>
 
-            <Link href="/packages" className="hover:text-yellow-400">
-              TOURS
-            </Link>
+            {/* PHONE BUTTON */}
+            <button className="bg-yellow-500 text-black px-6 py-2 font-semibold rounded hover:bg-yellow-600 transition">
+              +91 98765 43210
+            </button>
 
-            <Link href="/about" className="hover:text-yellow-400">
-              ABOUT
-            </Link>
-
-            <Link href="/contact" className="hover:text-yellow-400">
-              CONTACT
-            </Link>
           </div>
-
-          {/* DESKTOP PHONE */}
-          <button className="hidden lg:block bg-yellow-500 text-black px-6 py-2 font-semibold rounded hover:bg-yellow-600 transition">
-            +91 98765 43210
-          </button>
 
           {/* MOBILE TOGGLE */}
           <button
-            className="lg:hidden ml-auto"
+            className="lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
+
         </div>
 
-        {/* MOBILE MENU */}
+        {/* ================= MOBILE MENU ================= */}
         {mobileOpen && (
-          <div className="lg:hidden bg-[#0e2240] px-6 py-6 space-y-4">
+          <div className="lg:hidden bg-[#0e2240] px-6 py-8 space-y-6">
 
-            <Link href="/" onClick={() => setMobileOpen(false)}>
+            <Link
+              href="/"
+              onClick={() => setMobileOpen(false)}
+              className="block text-base"
+            >
               HOME
             </Link>
 
-            {/* MOBILE INTERNATIONAL */}
+            <Link
+              href="/about"
+              onClick={() => setMobileOpen(false)}
+              className="block text-base"
+            >
+              ABOUT
+            </Link>
+
+            <Link
+              href="/currency"
+              onClick={() => setMobileOpen(false)}
+              className="block text-base"
+            >
+              CURRENCY
+            </Link>
+
+            {/* INTERNATIONAL */}
             <div>
               <button
                 onClick={() =>
                   setOpenMobileMenu(
-                    openMobileMenu === "international"
-                      ? null
-                      : "international"
+                    openMobileMenu === "international" ? null : "international"
                   )
                 }
-                className="flex items-center justify-between w-full"
+                className="w-full flex justify-between items-center text-base"
               >
-                INTERNATIONAL <ChevronDown size={16} />
+                <span>INTERNATIONAL</span>
+                <span>
+                  {openMobileMenu === "international" ? "−" : "+"}
+                </span>
               </button>
 
               {openMobileMenu === "international" && (
-                <div className="pl-4 mt-2 space-y-2">
+                <div className="mt-3 space-y-2 text-sm pl-4">
                   {internationalCountries?.map((country) => (
                     <Link
                       key={country.slug}
-                      href={`/destinations/${country.slug}`}  
+                      href={`/destinations/${country.slug}`}
                       onClick={() => setMobileOpen(false)}
-                      className="block text-sm text-gray-300"
+                      className="block opacity-80"
                     >
                       {country.name}
                     </Link>
@@ -171,7 +196,7 @@ export default function NavbarClient({
               )}
             </div>
 
-            {/* MOBILE INDIA */}
+            {/* INDIA */}
             <div>
               <button
                 onClick={() =>
@@ -179,19 +204,22 @@ export default function NavbarClient({
                     openMobileMenu === "india" ? null : "india"
                   )
                 }
-                className="flex items-center justify-between w-full"
+                className="w-full flex justify-between items-center text-base"
               >
-                INDIA <ChevronDown size={16} />
+                <span>INDIA</span>
+                <span>
+                  {openMobileMenu === "india" ? "−" : "+"}
+                </span>
               </button>
 
               {openMobileMenu === "india" && (
-                <div className="pl-4 mt-2 space-y-2">
+                <div className="mt-3 space-y-2 text-sm pl-4 max-h-60 overflow-y-auto">
                   {indiaStates?.map((state) => (
                     <Link
                       key={state.slug}
-                      href={`/destinations/${state.slug}`}   
+                      href={`/destinations/${state.slug}`}
                       onClick={() => setMobileOpen(false)}
-                      className="block text-sm text-gray-300"
+                      className="block opacity-80"
                     >
                       {state.name}
                     </Link>
@@ -200,21 +228,29 @@ export default function NavbarClient({
               )}
             </div>
 
-            <Link href="/packages" onClick={() => setMobileOpen(false)}>
+            <Link
+              href="/packages"
+              onClick={() => setMobileOpen(false)}
+              className="block text-base"
+            >
               TOURS
             </Link>
 
-            <Link href="/about" onClick={() => setMobileOpen(false)}>
-              ABOUT
-            </Link>
-
-            <Link href="/contact" onClick={() => setMobileOpen(false)}>
+            <Link
+              href="/contact"
+              onClick={() => setMobileOpen(false)}
+              className="block text-base"
+            >
               CONTACT
             </Link>
 
-            <button className="mt-4 bg-yellow-500 text-black px-6 py-3 font-semibold rounded w-full">
+            <a
+              href="tel:+919876543210"
+              className="block bg-yellow-500 text-black py-3 rounded-md font-semibold text-center mt-4"
+            >
               +91 98765 43210
-            </button>
+            </a>
+
           </div>
         )}
       </nav>

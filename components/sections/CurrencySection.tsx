@@ -5,19 +5,18 @@ import dynamic from "next/dynamic";
 import { getRates } from "@/lib/currencyApi";
 import { currencyList } from "@/lib/currencyList";
 import CurrencyRow from "@/components/ui/CurrencyRow";
-import CurrencyDropdown from "@/components/ui/CurrencyDropdown"; // ✅ ADD THIS
-import { Plus } from "lucide-react";
+import CurrencyDropdown from "@/components/ui/CurrencyDropdown";
 
 const Select = dynamic(() => import("react-select"), { ssr: false });
 
 export default function CurrencySection() {
   const [baseCurrency, setBaseCurrency] = useState("USD");
   const [amount, setAmount] = useState(1);
-  const [rates, setRates] = useState<any>({});
+  const [rates, setRates] = useState<Record<string, number>>({});
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
 
-  const [selectedCurrencies, setSelectedCurrencies] = useState([
+  const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([
     "EUR",
     "INR",
     "JPY",
@@ -26,10 +25,17 @@ export default function CurrencySection() {
 
   useEffect(() => {
     async function fetchData() {
-      const data = await getRates(baseCurrency);
-      setRates(data?.rates || {});
-      setLastUpdated(data?.time || null);
+      try {
+        const data = await getRates(baseCurrency);
+        if (data?.rates) {
+          setRates(data.rates);
+          setLastUpdated(data.time);
+        }
+      } catch (error) {
+        console.log("Rate fetch error:", error);
+      }
     }
+
     fetchData();
   }, [baseCurrency]);
 
@@ -62,79 +68,92 @@ export default function CurrencySection() {
     }));
 
   return (
-    <section className="py-20 bg-[#f5f7fa]">
-      <div className="max-w-6xl mx-auto px-6">
+    <section className="py-16 bg-[#f5f7fa]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
-        {/* Heading */}
-        <h2 className="text-4xl font-bold text-center mb-3">
-          Live exchange rates
-        </h2>
+        {/* ================= HEADING ================= */}
+        <div className="mb-6">
+          <h2 className="text-3xl sm:text-4xl font-bold">
+            Live exchange rates
+          </h2>
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">
+            Compare 100+ currencies in real time & find the right moment to transfer funds
+          </p>
+        </div>
 
-        <p className="text-center text-gray-500 mb-12">
-          Compare 100+ currencies in real time & find the right moment to transfer funds
-        </p>
+        {/* ================= COLUMN HEADER + EDIT ================= */}
+        <div className="flex items-center justify-between mb-4">
 
-        {/* Column Header */}
-        <div className="flex justify-between items-center text-sm text-gray-500 mb-3 px-4">
-          <div className="flex gap-20">
-            <span>Inverse</span>
-            <span>Amount</span>
-            <span>Change (24h)</span>
-            <span>Chart (24h)</span>
+          {/* COLUMN TITLES */}
+          <div className="grid grid-cols-4 sm:grid-cols-5 items-center text-xs sm:text-sm text-gray-500 flex-1 px-2 sm:px-4">
+
+            <div className="col-span-1 sm:col-span-2">
+              Inverse
+            </div>
+
+            <div className="text-center sm:text-right">
+              Amount
+            </div>
+
+            <div className="text-center">
+              Change (24h)
+            </div>
+
+            <div className="text-center hidden sm:block">
+              Chart (24h)
+            </div>
+
           </div>
 
+          {/* EDIT BUTTON */}
           <button
             onClick={() => setEditMode(!editMode)}
-            className="border px-4 py-1 rounded-lg text-blue-600"
+            className="ml-2 border border-blue-600 text-blue-600 px-3 sm:px-4 py-1 rounded-lg text-xs sm:text-sm hover:bg-blue-50 transition"
           >
             {editMode ? "Done" : "Edit"}
           </button>
+
         </div>
 
-        {/* ✅ Base Currency Row (NOW DROPDOWN) */}
-        <div className="bg-[#001a3d] text-white rounded-xl px-6 py-4 flex justify-between items-center mb-4">
-
-          {/* LEFT SIDE DROPDOWN */}
-          <div className="w-72">
+        {/* ================= BASE CURRENCY ROW ================= */}
+        <div className="bg-[#001a3d] text-white rounded-xl px-4 sm:px-6 py-4 flex justify-between items-center mb-4">
+          <div className="w-52 sm:w-72">
             <CurrencyDropdown
               value={baseCurrency}
               onChange={setBaseCurrency}
             />
           </div>
 
-          {/* RIGHT SIDE AMOUNT */}
-          <div className="text-xl font-bold">
+          <div className="text-lg sm:text-xl font-bold">
             {amount}
           </div>
         </div>
 
-        {/* Currency Rows */}
+        {/* ================= CURRENCY ROWS ================= */}
         <div className="space-y-3">
           {selectedCurrencies.map((code) => {
             const currency = currencyList.find(
               (c) => c.code === code
             );
 
-            if (!currency || !rates?.[code]) return null;
+            if (!currency) return null;
 
             return (
               <CurrencyRow
                 key={code}
                 currency={currency}
-                rate={rates[code]}
+                rate={rates?.[code] ?? 0}
                 amount={amount}
                 baseCurrency={baseCurrency}
                 editMode={editMode}
-                onRemove={() =>
-                  handleRemoveCurrency(code)
-                }
+                onRemove={() => handleRemoveCurrency(code)}
               />
             );
           })}
         </div>
 
-        {/* Add Currency Dropdown */}
-        <div className="mt-6 w-72">
+        {/* ================= ADD CURRENCY ================= */}
+        <div className="mt-6 w-full sm:w-72">
           <Select
             options={options}
             placeholder="+ Add currency"
@@ -142,6 +161,7 @@ export default function CurrencySection() {
               handleAddCurrency(selected?.value)
             }
             isSearchable
+            isClearable
             formatOptionLabel={(option: any) => (
               <div className="flex items-center gap-3">
                 <img
@@ -169,9 +189,9 @@ export default function CurrencySection() {
           />
         </div>
 
-        {/* Last Updated */}
+        {/* ================= LAST UPDATED ================= */}
         {lastUpdated && (
-          <div className="flex justify-end items-center mt-6 text-sm text-gray-500 gap-3">
+          <div className="flex flex-col sm:flex-row justify-end items-center mt-6 text-sm text-gray-500 gap-3">
             <div className="w-10 h-10 border-2 border-blue-600 rounded-full flex items-center justify-center text-blue-600 font-semibold">
               60
             </div>

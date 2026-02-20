@@ -13,38 +13,29 @@ export async function GET(req: NextRequest) {
 
   try {
     const response = await fetch(
-      `https://xecdapi.xe.com/v1/convert_from.json/?from=${from}&to=EUR,INR,JPY,RUB`,
-      {
-        headers: {
-          Authorization:
-            "Basic " +
-            Buffer.from(
-              `${process.env.XE_ACCOUNT_ID}:${process.env.XE_API_KEY}`
-            ).toString("base64"),
-        },
-      }
+      `https://open.er-api.com/v6/latest/${from}`,
+      { cache: "no-store" }
     );
 
     const data = await response.json();
 
-    console.log("XE RAW RESPONSE:", data); // DEBUG
-
-    const rates: Record<string, number> = {};
-
-    if (data?.to && Array.isArray(data.to)) {
-      data.to.forEach((item: any) => {
-        rates[item.quotecurrency] = item.mid;
-      });
+    if (data.result !== "success") {
+      return NextResponse.json(
+        { error: "Failed to fetch rates" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({
-      rates,
-      time: new Date().toISOString(),
+      rates: data.rates,
+      time: data.time_last_update_utc,
     });
 
   } catch (error) {
+    console.log("Server error:", error);
+
     return NextResponse.json(
-      { error: "Failed to fetch rates" },
+      { error: "Server error" },
       { status: 500 }
     );
   }

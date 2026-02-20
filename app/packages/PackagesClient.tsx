@@ -11,12 +11,14 @@ export default function PackagesClient({ data }: any) {
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("All");
   const [selectedState, setSelectedState] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("All"); // ✅ NEW
   const [maxPrice, setMaxPrice] = useState("");
 
   const resetFilters = () => {
     setSearch("");
     setSelectedCountry("All");
     setSelectedState("All");
+    setSelectedCategory("All"); // ✅ RESET
     setMaxPrice("");
   };
 
@@ -38,10 +40,19 @@ export default function PackagesClient({ data }: any) {
           tour.country?.name === selectedCountry) &&
         (selectedState === "All" ||
           tour.state?.name === selectedState) &&
+        (selectedCategory === "All" ||
+          tour.category === selectedCategory.toLowerCase()) && // ✅ FILTER
         (maxPrice === "" || tour.price <= Number(maxPrice))
       );
     });
-  }, [search, selectedCountry, selectedState, maxPrice, tours]);
+  }, [
+    search,
+    selectedCountry,
+    selectedState,
+    selectedCategory,
+    maxPrice,
+    tours,
+  ]);
 
   return (
     <div>
@@ -49,7 +60,7 @@ export default function PackagesClient({ data }: any) {
       {/* ================= FILTER CARD ================= */}
       <div className="bg-white rounded-3xl shadow-xl p-8 mb-16 border border-gray-100">
 
-        <div className="grid md:grid-cols-5 gap-5">
+        <div className="grid md:grid-cols-6 gap-5">
 
           {/* Search */}
           <input
@@ -57,7 +68,7 @@ export default function PackagesClient({ data }: any) {
             placeholder="Search tours..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
+            className="border border-gray-200 rounded-xl px-4 py-3 outline-none"
           />
 
           {/* Country */}
@@ -67,7 +78,7 @@ export default function PackagesClient({ data }: any) {
               setSelectedCountry(e.target.value);
               setSelectedState("All");
             }}
-            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
+            className="border border-gray-200 rounded-xl px-4 py-3 outline-none"
           >
             <option value="All">All Countries</option>
             {countries.map((c: any) => (
@@ -81,7 +92,7 @@ export default function PackagesClient({ data }: any) {
           <select
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
+            className="border border-gray-200 rounded-xl px-4 py-3 outline-none"
           >
             <option value="All">All States</option>
             {filteredStates.map((s: any) => (
@@ -91,13 +102,24 @@ export default function PackagesClient({ data }: any) {
             ))}
           </select>
 
+          {/* Category (NEW) */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="border border-gray-200 rounded-xl px-4 py-3 outline-none"
+          >
+            <option value="All">All Categories</option>
+            <option value="Trending">Trending</option>
+            <option value="Popular">Popular</option>
+          </select>
+
           {/* Max Price */}
           <input
             type="number"
             placeholder="Max Price"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition"
+            className="border border-gray-200 rounded-xl px-4 py-3 outline-none"
           />
 
           {/* Reset */}
@@ -124,7 +146,7 @@ export default function PackagesClient({ data }: any) {
           </h3>
           <button
             onClick={resetFilters}
-            className="bg-primary text-white px-6 py-3 rounded-xl hover:opacity-90 transition"
+            className="bg-blue-600 text-white px-6 py-3 rounded-xl"
           >
             Reset Filters
           </button>
@@ -133,21 +155,12 @@ export default function PackagesClient({ data }: any) {
 
       {/* ================= TOURS GRID ================= */}
       {filteredTours.length > 0 && (
-        <div className="grid 
-                        grid-cols-1 
-                        sm:grid-cols-2 
-                        lg:grid-cols-3 
-                        gap-10 
-                        max-w-6xl 
-                        mx-auto">
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
           {filteredTours.map((tour: any) => (
             <TourCard key={tour._id} tour={tour} />
           ))}
-
         </div>
       )}
-
     </div>
   );
 }

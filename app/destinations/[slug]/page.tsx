@@ -1,7 +1,6 @@
 import { sanityClient } from "@/lib/sanity.client";
 import { urlFor } from "@/lib/sanity.image";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import TourCard from "@/components/cards/TourCard";
 
@@ -11,7 +10,6 @@ const query = `
   "country": *[_type == "country" && slug.current == $slug][0]{
     _id,
     name,
-    slug,
     mainImage,
     shortDescription,
     description,
@@ -21,14 +19,12 @@ const query = `
   "state": *[_type == "state" && slug.current == $slug][0]{
     _id,
     name,
-    slug,
     mainImage,
     shortDescription,
     description,
     gallery[],
     country->{
-      name,
-      slug
+      name
     }
   },
 
@@ -45,7 +41,8 @@ const query = `
     mainImage,
     shortDescription,
     price,
-    duration
+    duration,
+    category   // ✅ IMPORTANT
   }
 }
 `;
@@ -56,18 +53,12 @@ export default async function DestinationPage({
   params: Promise<{ slug: string }>;
 }) {
 
+  // ✅ IMPORTANT FIX FOR NEXT 16
   const { slug } = await params;
 
   if (!slug) return notFound();
 
-  let data;
-
-  try {
-    data = await sanityClient.fetch(query, { slug });
-  } catch (error) {
-    console.error("Sanity fetch error:", error);
-    return notFound();
-  }
+  const data = await sanityClient.fetch(query, { slug });
 
   if (!data) return notFound();
 
@@ -79,8 +70,8 @@ export default async function DestinationPage({
   return (
     <div className="bg-white pt-32">
 
-      {/* ================= HERO SECTION ================= */}
-      <section className="relative h-[75vh]">
+      {/* HERO */}
+      <section className="relative h-[70vh]">
         {pageData.mainImage && (
           <Image
             src={urlFor(pageData.mainImage).url()}
@@ -91,67 +82,29 @@ export default async function DestinationPage({
           />
         )}
 
-        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            Explore {pageData.name}
-          </h1>
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-center px-4">
+          <div>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+              Explore {pageData.name}
+            </h1>
 
-          {pageData.shortDescription && (
-            <p className="text-white max-w-3xl text-lg opacity-90">
-              {pageData.shortDescription}
-            </p>
-          )}
+            {pageData.shortDescription && (
+              <p className="text-white max-w-2xl mx-auto text-lg opacity-90">
+                {pageData.shortDescription}
+              </p>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* ================= DESCRIPTION ================= */}
-      {pageData.description && (
-        <section className="container mx-auto px-6 py-20">
-          <h2 className="text-3xl font-bold mb-8 text-center">
-            About {pageData.name}
-          </h2>
-
-          <p className="text-gray-700 leading-relaxed max-w-4xl mx-auto text-center text-lg">
-            {pageData.description}
-          </p>
-        </section>
-      )}
-
-      {/* ================= GALLERY ================= */}
-      {pageData.gallery?.length > 0 && (
-        <section className="bg-gray-50 py-20">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl font-bold mb-12 text-center">
-              Destination Gallery
-            </h2>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {pageData.gallery.map((img: any, index: number) => (
-                <div
-                  key={index}
-                  className="relative h-56 rounded-2xl overflow-hidden shadow-md"
-                >
-                  <Image
-                    src={urlFor(img).url()}
-                    alt="Gallery"
-                    fill
-                    className="object-cover hover:scale-110 transition duration-500"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ================= TOURS ================= */}
-      <section className="max-w-6xl mx-auto px-6 py-24">
+      {/* TOURS */}
+      <section className="max-w-7xl mx-auto px-6 py-24">
         <h2 className="text-3xl font-bold mb-16 text-center">
           Available Tours in {pageData.name}
         </h2>
 
         {tours.length === 0 ? (
-          <p className="text-center text-gray-500">
+          <p className="text-center text-gray-500 text-lg">
             No tours available yet.
           </p>
         ) : (
@@ -159,7 +112,7 @@ export default async function DestinationPage({
                           grid-cols-1 
                           sm:grid-cols-2 
                           lg:grid-cols-3 
-                          gap-10">
+                          gap-12">
 
             {tours.map((tour: any) => (
               <TourCard key={tour._id} tour={tour} />

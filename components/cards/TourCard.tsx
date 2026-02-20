@@ -10,70 +10,90 @@ interface Tour {
   duration: string;
   shortDescription: string;
   mainImage: any;
+  category?: string;
 }
 
 export default function TourCard({ tour }: { tour: Tour }) {
   return (
-    <div className="group bg-white rounded-3xl 
-                    shadow-md hover:shadow-2xl 
-                    transition-all duration-500 
-                    hover:-translate-y-2 
-                    flex flex-col 
-                    w-full 
-                    h-[500px]">
-
-      {/* ===== IMAGE SECTION ===== */}
-      <div className="relative h-[250px] w-full overflow-hidden rounded-t-3xl">
+    <div
+      className="group bg-white rounded-3xl
+                 border border-gray-100
+                 shadow-md
+                 transition-all duration-500 ease-out
+                 hover:shadow-2xl
+                 hover:-translate-y-2
+                 flex flex-col
+                 w-full
+                 min-h-[540px]"
+    >
+      {/* ================= IMAGE ================= */}
+      <div className="relative h-[260px] w-full overflow-hidden rounded-t-3xl">
         <Image
           src={urlFor(tour.mainImage).url()}
           alt={tour.title}
           fill
-          className="object-cover transition duration-700 group-hover:scale-110"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t 
+                        from-black/60 via-black/20 to-transparent" />
 
-        <div className="absolute top-4 right-4 bg-white/90 text-xs font-semibold px-3 py-1 rounded-full shadow">
-          {tour.duration}
-        </div>
-
-        <div className="absolute bottom-4 left-4 bg-[#F0B100] text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
-          ₹{tour.price.toLocaleString()}
-        </div>
+        {/* Category Badge */}
+        {tour.category && (
+          <div
+            className={`absolute top-4 right-4 text-xs font-semibold px-3 py-1 rounded-full shadow capitalize
+            ${
+              tour.category === "popular"
+                ? "bg-red-500 text-white"
+                : "bg-blue-600 text-white"
+            }`}
+          >
+            {tour.category}
+          </div>
+        )}
       </div>
 
-      {/* ===== CONTENT SECTION ===== */}
-      <div className="flex-1 px-5 pt-5 flex flex-col">
+      {/* ================= CONTENT ================= */}
+      <div className="flex-1 px-6 pt-6 flex flex-col">
 
-        {/* Fixed height title area */}
-        <h3 className="text-lg font-semibold mb-2 line-clamp-2 min-h-[52px]">
+        {/* Duration */}
+        <span className="inline-block mb-3 bg-gray-100 text-xs font-semibold px-3 py-1 rounded-full w-fit">
+          {tour.duration}
+        </span>
+
+        {/* Title */}
+        <h3 className="text-lg font-semibold mb-3 line-clamp-2 min-h-[52px] leading-snug">
           {tour.title}
         </h3>
 
-        {/* Fixed height description area */}
+        {/* Description */}
         <p className="text-gray-600 text-sm line-clamp-3 min-h-[60px]">
           {tour.shortDescription}
         </p>
 
+        {/* Price */}
+        <div className="mt-5 text-xl font-bold text-[#F0B100]">
+          ₹{tour.price?.toLocaleString()}
+        </div>
       </div>
 
-      {/* ===== BUTTON SECTION ===== */}
-      <div className="px-5 pb-5 mt-auto">
+      {/* ================= BUTTON ================= */}
+      <div className="px-6 pb-6 mt-auto">
         <Link
           href={`/packages/${tour.slug.current}`}
-          className="w-full flex items-center justify-center gap-2 
-                     bg-[#F0B100] text-white 
-                     py-3 rounded-full 
-                     font-semibold text-sm 
-                     transition-all duration-300 
-                     hover:bg-[#d89f00] 
-                     hover:gap-3 
+          className="w-full flex items-center justify-center gap-2
+                     bg-[#F0B100] text-white
+                     py-3 rounded-full
+                     font-semibold text-sm
+                     transition-all duration-300
+                     hover:bg-[#d89f00]
+                     hover:gap-3
                      shadow-md hover:shadow-lg"
         >
           View Details →
         </Link>
       </div>
-
     </div>
   );
 }

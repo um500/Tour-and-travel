@@ -2,28 +2,32 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { currencyList } from "@/lib/currencyList";
+import { currencyList, CurrencyType } from "@/lib/currencyList";
 import { getRates } from "@/lib/currencyApi";
 
 const Select = dynamic(() => import("react-select"), { ssr: false });
 
 interface Props {
-  isOpen: boolean;
+  currency: CurrencyType;
+  rate: number;
+  amount: number;
   onClose: () => void;
-  fromCurrency: string;
-  toCurrency: string;
 }
 
 export default function ExchangeModal({
-  isOpen,
+  currency,
+  rate,
+  amount,
   onClose,
-  fromCurrency,
-  toCurrency,
 }: Props) {
 
-  const [from, setFrom] = useState(fromCurrency);
-  const [to, setTo] = useState(toCurrency);
-  const [liveRate, setLiveRate] = useState<number>(0);
+  // ✅ FROM = base currency (selected row currency)
+  const [from, setFrom] = useState<string>(currency.code);
+
+  // ✅ TO default USD (or any)
+  const [to, setTo] = useState<string>("USD");
+
+  const [liveRate, setLiveRate] = useState<number>(rate || 0);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -33,13 +37,13 @@ export default function ExchangeModal({
     address: "",
   });
 
-  // 🔐 CAPTCHA STATES
+  // 🔐 CAPTCHA
   const [num1, setNum1] = useState(0);
   const [num2, setNum2] = useState(0);
   const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [error, setError] = useState("");
 
-  // Generate random captcha
+  // Generate captcha
   const generateCaptcha = () => {
     const a = Math.floor(Math.random() * 10) + 1;
     const b = Math.floor(Math.random() * 10) + 1;
@@ -47,14 +51,12 @@ export default function ExchangeModal({
     setNum2(b);
   };
 
-  // On open → generate captcha
+  // On mount → generate captcha
   useEffect(() => {
-    if (isOpen) {
-      generateCaptcha();
-    }
-  }, [isOpen]);
+    generateCaptcha();
+  }, []);
 
-  // Fetch live rate dynamically
+  // Fetch live rate when from/to changes
   useEffect(() => {
     async function fetchRate() {
       if (!from || !to) return;
@@ -93,21 +95,20 @@ export default function ExchangeModal({
     onClose();
   };
 
-  if (!isOpen) return null;
-
   const options = currencyList.map((currency) => ({
     value: currency.code,
     label: currency.name,
   }));
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
 
-      <div className="bg-white rounded-3xl p-8 w-full max-w-xl shadow-xl relative">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-xl shadow-xl relative max-h-[90vh] overflow-y-auto">
 
+        {/* CLOSE */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-red-500"
+          className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl"
         >
           ✕
         </button>
@@ -148,7 +149,7 @@ export default function ExchangeModal({
             className="w-full border rounded-lg p-3"
           />
 
-          {/* FROM / TO Dropdown */}
+          {/* FROM / TO */}
           <div className="grid grid-cols-2 gap-4">
 
             <Select
@@ -193,7 +194,7 @@ export default function ExchangeModal({
             className="w-full border rounded-lg p-3"
           />
 
-          {/* 🔐 MATH CAPTCHA */}
+          {/* CAPTCHA */}
           <div className="space-y-2">
             <div className="font-medium">
               Verify you are human: {num1} + {num2} = ?

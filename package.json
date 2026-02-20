@@ -20,7 +20,8 @@
     "react-dom": "19.2.3",
     "react-select": "^5.10.2",
     "react-sparklines": "^1.7.0",
-    "swiper": "^12.1.1",
+    "recharts": "^3.7.0",
+    "swiper": "^12.1.2",
     "tailwind-merge": "^3.4.1"
   },
   "devDependencies": {
