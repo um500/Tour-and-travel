@@ -4,7 +4,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import BookingForm from "@/components/ui/BookingForm";
 
-
 const query = `
 *[_type == "tour" && slug.current == $slug][0]{
   _id,
@@ -24,15 +23,33 @@ const query = `
 }
 `;
 
+interface Itinerary {
+  day: string;
+  details: string;
+}
+
+interface Tour {
+  _id: string;
+  title: string;
+  mainImage?: any;
+  galleryImages?: any[];
+  overview?: string;
+  price?: number;
+  duration?: string;
+  highlights?: string[];
+  itinerary?: Itinerary[];
+  inclusions?: string[];
+  exclusions?: string[];
+}
+
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }
 
 export default async function TourDetails({ params }: PageProps) {
+  const { slug } = params;
 
-  const { slug } = await params;
-
-  const tour = await sanityClient.fetch(query, { slug });
+  const tour: Tour = await sanityClient.fetch(query, { slug });
 
   if (!tour) return notFound();
 
@@ -41,12 +58,15 @@ export default async function TourDetails({ params }: PageProps) {
 
       {/* ================= HERO SECTION ================= */}
       <section className="relative h-[75vh]">
-        <Image
-          src={urlFor(tour.mainImage).url()}
-          alt={tour.title}
-          fill
-          className="object-cover"
-        />
+        {tour.mainImage && (
+          <Image
+            src={urlFor(tour.mainImage).url()}
+            alt={tour.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        )}
 
         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center text-white px-6">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
@@ -54,13 +74,17 @@ export default async function TourDetails({ params }: PageProps) {
           </h1>
 
           <div className="flex gap-4">
-            <span className="bg-white/20 backdrop-blur px-5 py-2 rounded-full">
-              {tour.duration}
-            </span>
+            {tour.duration && (
+              <span className="bg-white/20 backdrop-blur px-5 py-2 rounded-full">
+                {tour.duration}
+              </span>
+            )}
 
-            <span className="bg-yellow-500 px-5 py-2 rounded-full font-semibold text-black">
-              ₹{tour.price?.toLocaleString()}
-            </span>
+            {tour.price && (
+              <span className="bg-yellow-500 px-5 py-2 rounded-full font-semibold text-black">
+                ₹{tour.price.toLocaleString()}
+              </span>
+            )}
           </div>
         </div>
       </section>
@@ -72,14 +96,12 @@ export default async function TourDetails({ params }: PageProps) {
         <div className="md:col-span-2 space-y-24">
 
           {/* -------- GALLERY -------- */}
-          {tour.galleryImages && (
+          {tour.galleryImages && tour.galleryImages.length > 0 && (
             <section>
-              <h2 className="text-3xl font-bold mb-8">
-                Gallery
-              </h2>
+              <h2 className="text-3xl font-bold mb-8">Gallery</h2>
 
               <div className="grid grid-cols-2 gap-4">
-                {tour.galleryImages.map((img: any, i: number) => (
+                {tour.galleryImages.map((img, i) => (
                   <div
                     key={i}
                     className="relative h-52 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition"
@@ -97,25 +119,22 @@ export default async function TourDetails({ params }: PageProps) {
           )}
 
           {/* -------- OVERVIEW -------- */}
-          <section>
-            <h2 className="text-3xl font-bold mb-6">
-              Overview
-            </h2>
-
-            <p className="text-gray-700 leading-relaxed text-lg">
-              {tour.overview}
-            </p>
-          </section>
+          {tour.overview && (
+            <section>
+              <h2 className="text-3xl font-bold mb-6">Overview</h2>
+              <p className="text-gray-700 leading-relaxed text-lg">
+                {tour.overview}
+              </p>
+            </section>
+          )}
 
           {/* -------- HIGHLIGHTS -------- */}
-          {tour.highlights && (
+          {tour.highlights && tour.highlights.length > 0 && (
             <section>
-              <h2 className="text-3xl font-bold mb-8">
-                Highlights
-              </h2>
+              <h2 className="text-3xl font-bold mb-8">Highlights</h2>
 
               <div className="grid md:grid-cols-2 gap-6">
-                {tour.highlights.map((item: string, i: number) => (
+                {tour.highlights.map((item, i) => (
                   <div
                     key={i}
                     className="bg-gray-50 p-5 rounded-2xl shadow-sm hover:shadow-md transition"
@@ -128,14 +147,14 @@ export default async function TourDetails({ params }: PageProps) {
           )}
 
           {/* -------- ITINERARY -------- */}
-          {tour.itinerary && (
+          {tour.itinerary && tour.itinerary.length > 0 && (
             <section className="bg-gray-50 p-10 rounded-3xl">
               <h2 className="text-3xl font-bold mb-10 text-center">
                 Tour Itinerary
               </h2>
 
               <div className="space-y-6">
-                {tour.itinerary.map((day: any, i: number) => (
+                {tour.itinerary.map((day, i) => (
                   <div
                     key={i}
                     className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition"
@@ -163,14 +182,14 @@ export default async function TourDetails({ params }: PageProps) {
           <section className="grid md:grid-cols-2 gap-10">
 
             {/* Inclusions */}
-            {tour.inclusions && (
+            {tour.inclusions && tour.inclusions.length > 0 && (
               <div className="bg-green-50 border border-green-200 p-8 rounded-3xl shadow-sm">
                 <h2 className="text-2xl font-bold mb-6 text-green-700">
                   ✓ Inclusions
                 </h2>
 
                 <ul className="space-y-3">
-                  {tour.inclusions.map((item: string, i: number) => (
+                  {tour.inclusions.map((item, i) => (
                     <li key={i} className="flex gap-2">
                       <span className="text-green-600 font-bold">✓</span>
                       {item}
@@ -181,14 +200,14 @@ export default async function TourDetails({ params }: PageProps) {
             )}
 
             {/* Exclusions */}
-            {tour.exclusions && (
+            {tour.exclusions && tour.exclusions.length > 0 && (
               <div className="bg-red-50 border border-red-200 p-8 rounded-3xl shadow-sm">
                 <h2 className="text-2xl font-bold mb-6 text-red-700">
                   ✕ Exclusions
                 </h2>
 
                 <ul className="space-y-3">
-                  {tour.exclusions.map((item: string, i: number) => (
+                  {tour.exclusions.map((item, i) => (
                     <li key={i} className="flex gap-2">
                       <span className="text-red-600 font-bold">✕</span>
                       {item}
@@ -205,9 +224,7 @@ export default async function TourDetails({ params }: PageProps) {
         {/* RIGHT SIDE BOOKING CARD */}
         <BookingForm price={tour.price} />
 
-
       </section>
-
     </div>
   );
 }
